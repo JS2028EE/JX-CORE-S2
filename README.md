@@ -6,6 +6,8 @@ I wanted to understand what actually goes into a microcontroller board: USB-C po
 
 > **Status: schematic in progress (Rev A).** This repository documents the intended design and the parts selected so far. The EasyEDA source, ERC report, PCB layout, fabrication files, and physical test results have **not** been added yet. The board has not been verified or manufactured. Do not treat the tables here as proof that every connection is already present in the EasyEDA file.
 
+> **Netlist finding (2026-09-30):** The exported schematic has a disconnected USB/regulator ground net. Connect `USBC1.A1B12`, `USBC1.B1A12`, `U2.2`, and `C1.2` to the main `GND` net before PCB conversion. See the [export review](docs/NETLIST_REVIEW_2026-09-30.md); an earlier visual review had missed this.
+
 ## What it is supposed to do
 
 - Run firmware on an ESP32-S2 single-core processor (up to 240 MHz) with 2.4 GHz Wi-Fi, 4 MB flash, and native full-speed USB.
@@ -45,9 +47,10 @@ The detailed [pin-by-pin header map](docs/PINOUT.md), [component selection](docs
 - [x] Select module, USB connector, regulator, USB protection, buttons, passives, and four headers.
 - [x] Draw the power, EN, IO0, USB, and indicator blocks in EasyEDA.
 - [x] Connect the module GND pins in the working schematic, per the latest design update.
-- [ ] Wire **every header contact electrically** to its matching module/net and verify via Design Manager/netlist.
+- [x] Verify **every header contact electrically** against its matching module/net in the exported netlist.
+- [ ] Join the USB connector ground, U2 regulator ground, and C1 input capacitor return to the main `GND` net; re-export the `.enet` and confirm the separate `$1N3` net is gone.
 - [ ] Confirm the green `LED1` schematic symbol exports as Everlight C72043 with the correct footprint and cathode orientation; test expected visibility with 330 Ω.
-- [ ] Run ERC and review every power, USB, BOOT, EN, and GND net; fix unintended open pins.
+- [x] Run schematic DRC (reported zero errors) and inspect the exported power, USB, BOOT, EN, and GND nets.
 - [ ] Export and commit the EasyEDA source and a dated schematic PDF/PNG.
 - [ ] Place and route the PCB with the antenna keepout, ground plane, short decoupling paths, and USB routing rules.
 - [ ] Run PCB DRC; inspect footprint pin numbering and 3D orientation; export Gerbers/BOM/placement files.
