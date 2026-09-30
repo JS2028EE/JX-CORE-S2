@@ -67,6 +67,27 @@ The module's **IO19 (pad 23)** and **IO20 (pad 24)** are dedicated here to USB D
 
 The module has its own internal flash and antenna. The exposed signals are 3.3 V logic; attached peripherals need their own current and voltage checks. IO45 and IO46 have internal weak pull-downs for their default strap values. An external pull-up or driven HIGH on H3 pin 3 (IO45) at reset can select 1.8 V for the flash supply and prevent booting. H4 pin 3 (IO46) must be LOW when entering download mode with IO0 LOW; it cannot drive an output at all. Label these contacts `IO45 STRAP` and `IO46 IN/STRAP` on the PCB, and test boot and flashing with attached peripherals. The BOOT button still pulls IO0 low at reset to select the download path.
 
+## Suggested firmware interface map
+
+These names describe **capabilities and recommended firmware assignments**, not extra fixed wiring inside the PCB. Most digital peripherals can be routed to other suitable GPIOs through the ESP32-S2 GPIO matrix.
+
+| Function | GPIO | Header contact | Note |
+| --- | --- | --- | --- |
+| I²C SDA | IO7 | H1 pin 9 | Suggested shared data line |
+| I²C SCL | IO8 | H1 pin 10 | Suggested shared clock line |
+| SPI2 CS0 | IO10 | H2 pin 2 | Direct IO_MUX chip select for first device |
+| SPI2 MOSI | IO11 | H2 pin 3 | Direct IO_MUX data out |
+| SPI2 SCLK | IO12 | H2 pin 4 | Direct IO_MUX clock |
+| SPI2 MISO | IO13 | H2 pin 5 | Direct IO_MUX data in |
+| UART0 TX | IO43 / TXD0 | H4 pin 9 | Board transmit → peripheral receive |
+| UART0 RX | IO44 / RXD0 | H4 pin 10 | Board receive ← peripheral transmit |
+
+Every exposed IO1–IO18, IO21, IO26, and IO33–IO45 can be ordinary digital input or output when not assigned to another function. IO46 on H4 pin 3 is **input only**. IO0 is on the BOOT button circuit and is not header-accessible. IO19 and IO20 are used for on-board USB D−/D+ and should stay reserved for USB in this design. IO26 is available only with the selected N4 module; the N4R2 variant uses it for PSRAM.
+
+For analog input, **ADC1** is IO1–IO10 (H1 pins 3–10 and H2 pins 1–2); **ADC2** is IO11–IO18 on H2 pins 3–10. IO19/IO20 also have ADC2 functions on the chip but are already occupied by USB. Prefer ADC1 for sampling while Wi-Fi is active because ADC2 is shared with Wi-Fi and readings may be disrupted. Analog output is available from the two 8-bit DAC channels on **IO17/H2 pin 9** and **IO18/H2 pin 10**. An ADC input is still subject to the configured attenuation and voltage limits; do not assume its full-scale measurement range is exactly 0–3.3 V.
+
+I²C needs SDA and SCL pull-ups to **3V3**. A typical starting point is 4.7 kΩ on each line; check whether a connected sensor module already supplies them before adding more. The proposed SPI and I²C assignments use different pins, so both buses can be used together. Firmware must explicitly select these GPIO numbers.
+
 ## EasyEDA connection check
 
 The red text printed inside a header symbol is **its pin name**, not a net label. Add an electrical wire from each header pin endpoint, then either connect it directly to the intended signal or put the **same** net label on short wires at both ends. Example: H1 pin 3 wire labeled `IO1` and U1 pad 5 wire labeled `IO1`. Ground and power flags must actually land on a wire or pin. Use the Design Manager to see which pins belong to each net, refresh ERC after edits, and inspect the exported netlist before PCB conversion. The [EasyEDA wiring guide](https://docs.easyeda.com/en/Schematic/Wiring-Tools/) describes net labels and their behavior.
