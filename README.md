@@ -46,7 +46,7 @@ The detailed [pin-by-pin header map](docs/PINOUT.md), [component selection](docs
 - [x] Draw the power, EN, IO0, USB, and indicator blocks in EasyEDA.
 - [x] Connect the module GND pins in the working schematic, per the latest design update.
 - [ ] Wire **every header contact electrically** to its matching module/net and verify via Design Manager/netlist.
-- [ ] Assign and confirm the **actual green LED** LCSC part/footprint at D1 (a candidate is listed in the BOM).
+- [ ] Confirm the green `LED1` schematic symbol exports as Everlight C72043 with the correct footprint and cathode orientation; test expected visibility with 330 Ω.
 - [ ] Run ERC and review every power, USB, BOOT, EN, and GND net; fix unintended open pins.
 - [ ] Export and commit the EasyEDA source and a dated schematic PDF/PNG.
 - [ ] Place and route the PCB with the antenna keepout, ground plane, short decoupling paths, and USB routing rules.
