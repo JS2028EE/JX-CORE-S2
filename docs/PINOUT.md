@@ -28,7 +28,7 @@
 | H2 | 10 | IO18 | 22 | GPIO / ADC2 / DAC2 capable |
 | H3 | 1 | GND | — | Ground |
 | H3 | 2 | 3V3 | 3 | Regulated rail |
-| H3 | 3 | IO0 | 4 | Shared with BOOT; strapping pin |
+| H3 | 3 | IO45 | 41 | Strapping pin; keep low at reset for 3.3 V flash supply |
 | H3 | 4 | IO21 | 25 | GPIO |
 | H3 | 5 | IO26 | 26 | Available on selected **N4**, unavailable on N4R2 with PSRAM |
 | H3 | 6 | IO33 | 28 | GPIO |
@@ -38,7 +38,7 @@
 | H3 | 10 | IO37 | 33 | GPIO |
 | H4 | 1 | GND | — | Ground |
 | H4 | 2 | USB_5V | — | Connector VBUS; USB-powered only |
-| H4 | 3 | EN | 45 | Shared with RESET; **not IO45** |
+| H4 | 3 | IO46 | 44 | Input only; strapping pin, keep low for download mode |
 | H4 | 4 | IO38 | 34 | GPIO |
 | H4 | 5 | IO39 | 35 | GPIO / JTAG MTCK default |
 | H4 | 6 | IO40 | 36 | GPIO / JTAG MTDO default |
@@ -47,7 +47,7 @@
 | H4 | 9 | TXD0 / IO43 | 39 | UART0 TX, 3.3 V logic |
 | H4 | 10 | RXD0 / IO44 | 40 | UART0 RX, 3.3 V logic |
 
-The module's **IO19 (pad 23)** and **IO20 (pad 24)** are dedicated here to USB D− and D+. Module `IO45` (pad 41) and `IO46` (pad 44) are **not exposed** in this Rev A header map; they are strapping-related pins and IO46 is input-only. Module pad 27 is `NC`. Refer to the [module datasheet](https://documentation.espressif.com/esp32-s2-mini-2_esp32-s2-mini-2u_datasheet_en.html) for alternate pin functions and boot straps.
+The module's **IO19 (pad 23)** and **IO20 (pad 24)** are dedicated here to USB D− and D+. IO0 and EN are connected to their on-board BOOT and RESET circuits and are **not exposed on these headers**. IO45 and IO46 are exposed instead, with the strapping restrictions below. Module pad 27 is `NC`. Refer to the [module datasheet](https://documentation.espressif.com/esp32-s2-mini-2_esp32-s2-mini-2u_datasheet_en.html) for alternate pin functions and boot straps.
 
 ## Schematic nets, step by step
 
@@ -59,11 +59,13 @@ The module's **IO19 (pad 23)** and **IO20 (pad 24)** are dedicated here to USB D
 | CC1 / CC2 | Each USB-C CC contact → its **own** 5.1 kΩ resistor → GND. |
 | USB_D− | Connector A7/B7 combined → ESD path → 22 Ω series resistor → module IO19/pad 23. |
 | USB_D+ | Connector A6/B6 combined → ESD path → 22 Ω series resistor → module IO20/pad 24. |
-| IO0 / BOOT | Module pad 4 → 10 kΩ pull-up to 3V3, momentary button to GND, H3 pin 3. |
-| EN / RESET | Module pad 45 → 10 kΩ pull-up to 3V3, 1 µF capacitor to GND, momentary button to GND, H4 pin 3. |
+| IO0 / BOOT | Module pad 4 → 10 kΩ pull-up to 3V3 and momentary button to GND. No header connection. |
+| EN / RESET | Module pad 45 → 10 kΩ pull-up to 3V3, 1 µF capacitor to GND, and momentary button to GND. No header connection. |
+| IO45 | Module pad 41 → H3 pin 3. Strap-sensitive; avoid an external HIGH at reset. |
+| IO46 | Module pad 44 → H4 pin 3. Input only; avoid an external HIGH during download-mode entry. |
 | PWR_LED | 3V3 → 330 Ω resistor → green LED anode → green LED cathode → GND. |
 
-The module has its own internal flash and antenna. The exposed signals are 3.3 V logic; attached peripherals need their own current and voltage checks. A pulled-low IO0 during reset selects the download boot path, so external circuits on H3 pin 3 must not force the wrong boot state.
+The module has its own internal flash and antenna. The exposed signals are 3.3 V logic; attached peripherals need their own current and voltage checks. IO45 and IO46 have internal weak pull-downs for their default strap values. An external pull-up or driven HIGH on H3 pin 3 (IO45) at reset can select 1.8 V for the flash supply and prevent booting. H4 pin 3 (IO46) must be LOW when entering download mode with IO0 LOW; it cannot drive an output at all. Label these contacts `IO45 STRAP` and `IO46 IN/STRAP` on the PCB, and test boot and flashing with attached peripherals. The BOOT button still pulls IO0 low at reset to select the download path.
 
 ## EasyEDA connection check
 
