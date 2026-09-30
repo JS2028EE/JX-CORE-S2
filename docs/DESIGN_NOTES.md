@@ -10,7 +10,7 @@ This is a **design record**, not a lab report. Numbers below are engineering est
 - **USBLC6-2SC6 and two 22 Ω series resistors**: ESD protection at the connector and initially recommended USB series elements near the module. The actual routing, symbol pin assignment, and footprint must be checked.
 - **BOOT and RESET buttons**: IO0 sets a boot strap when the chip resets; EN is the chip enable/reset. A 10 kΩ + 1 µF EN network follows Espressif's suggested starting point for power-up timing.
 - **Green LED with 330 Ω**: a visible power indicator chosen by the project owner. The resistor prevents unbounded LED current. This is a rail indicator, not a firmware-controlled status LED.
-- **Four 10-pin headers**: access to sensors, UART, control pins, 3.3 V and GND. Header names alone do not establish connectivity; the netlist must prove it.
+- **Four 10-pin headers**: access to sensors, UART, control pins, 3.3 V and GND. H3 pin 3 is IO45 and H4 pin 3 is input-only IO46; both are boot straps. BOOT/IO0 and RESET/EN stay on their local button circuits. Header names alone do not establish connectivity; the netlist must prove it.
 
 ## Calculations
 
@@ -54,7 +54,7 @@ CC1 and CC2 each get a separate 5.1 kΩ pull-down (`Rd`) to GND for a basic sink
 3. **No high-power outputs.** The headers do not make GPIO pins motor drivers. A MOSFET/driver, external supply, shared ground, and inductive-load protection belong in a separate stage.
 4. **No battery charging or regulation from a Li-ion cell.** This revision expects USB 5 V. A battery path requires a charger, protection, and power-path design before connection.
 5. **No Bluetooth, PSRAM, 5 GHz Wi-Fi, or USB Power Delivery.** The ESP32-S2-MINI-2-N4 supplies 2.4 GHz Wi-Fi and 4 MB flash. USB is full-speed USB, not high-speed 480 Mb/s.
-6. **Boot straps matter.** IO0 on H3 shares the BOOT button; external circuitry must not inadvertently pull it low during reset. GPIO45 and GPIO46 are omitted from headers. IO26 is available on N4 but not the N4R2 PSRAM variant.
+6. **Boot straps matter.** IO0 stays on the BOOT circuit, not the header. H3 pin 3 exposes IO45: an external HIGH at reset can select 1.8 V flash supply and stop the N4 board from booting. H4 pin 3 exposes IO46: it is input only and must be LOW when entering download mode with IO0 LOW. Both straps default LOW through weak internal pull-downs; external peripherals must not override them at reset. IO26 is available on N4 but not the N4R2 PSRAM variant.
 7. **Header rails have a shared budget.** The connector's per-contact current rating does not increase the regulator or USB source capacity. Do not assume any maximum load without thermal and supply testing.
 
 ## PCB layout targets
@@ -69,11 +69,11 @@ Espressif's general chip guidelines include advice for bare IC designs as well a
 
 ## Verification plan before calling it a working board
 
-1. Inspect the EasyEDA **schematic netlist** for H1–H4, module GND pads, 3V3, USB_5V, IO0, EN, D+, D−. Refresh ERC and resolve errors one by one; unused intentional pins may receive No Connect flags only after review.
+1. Inspect the EasyEDA **schematic netlist** for H1–H4 (especially H3.3→IO45/pad 41 and H4.3→IO46/pad 44), module GND pads, 3V3, USB_5V, IO0, EN, D+, D−. Confirm IO0 and EN remain on their button networks. Refresh ERC and resolve errors one by one; unused intentional pins may receive No Connect flags only after review.
 2. Check every LCSC code against the footprint, **especially the green D1 LED**, C1/C2 0805 size, USB-C connector, ESD package, switch internal common pads, and module antenna shape.
 3. Check PCB layout visually, calculate USB trace geometry for the board stackup, then run DRC and inspect the generated Gerbers before ordering.
 4. On first power-up, use a current-limited source and measure USB_5V and 3V3 with no external peripherals. Check heating, supply drop, and switch behavior.
-5. Flash a small GPIO/USB test program, then test Wi-Fi, USB enumeration in both Type-C plug orientations, RESET/BOOT, LED visibility, and all mapped header pins. Record the date, photos, measurements, failures, and fixes in this repository.
+5. Flash a small GPIO/USB test program, then test Wi-Fi, USB enumeration in both Type-C plug orientations, RESET/BOOT, LED visibility, and all mapped header pins. Verify boot and download mode with any intended circuits on IO45/IO46; test IO46 as an input only. Record the date, photos, measurements, failures, and fixes in this repository.
 
 ## Primary references
 
