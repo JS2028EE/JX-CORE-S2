@@ -1,6 +1,6 @@
 # Design notes, math, limits, and verification
 
-This is a **design record**, not a lab report. Numbers below are engineering estimates based on nominal values; hardware measurements and the final green LED datasheet will decide the actual results. See the [BOM](BOM.md) and [pinout](PINOUT.md) for part links and exact connections.
+This is a **design record**, not a lab report. Numbers below are engineering estimates based on nominal values; hardware measurements and the green LED's real current–voltage curve will decide the actual results. See the [BOM](BOM.md) and [pinout](PINOUT.md) for part links and exact connections.
 
 ## Why these choices
 
@@ -28,7 +28,7 @@ If BOOT is held down, the 10 kΩ resistor draws approximately `3.3 V / 10 kΩ = 
 
 ### Green LED and resistor
 
-`I_LED ≈ (3.3 V − V_F) / 330 Ω` when the LED conducts. For an **illustrative** green LED with `V_F = 2.1 V`, `I ≈ 3.64 mA` and the resistor dissipates `I²R ≈ 4.36 mW`. For the **candidate** C12624, LCSC lists `V_F ≈ 3.1 V` at its stated test current; simple substitution gives `≈ 0.61 mA`, but actual V_F changes with current, so that is **not** a measured or reliable brightness prediction. The chosen resistor C23138 is rated 100 mW, well above either example. Assign and verify the exact green LED before committing to its current/brightness claim.
+`I_LED ≈ (3.3 V − V_F) / 330 Ω` when the LED conducts. For an **illustrative** lower-forward-voltage green LED with `V_F = 2.1 V` at its actual operating current, `I ≈ 3.64 mA` and the resistor dissipates `I²R ≈ 4.36 mW`. The schematic instead labels `LED1` as Everlight **19-217/GHC-YR1S2/3T**, LCSC **C72043**. Everlight lists 3.3 V typical forward voltage at **20 mA**, so that data point cannot predict the LED's current or visibility on a 3.3 V rail with 330 Ω. Expect possible dimness and test it or choose a lower-forward-voltage green part. The chosen resistor C23138 is rated 100 mW, well above the illustrative dissipation.
 
 ### Regulator heat and rail current
 
@@ -70,7 +70,7 @@ Espressif's general chip guidelines include advice for bare IC designs as well a
 ## Verification plan before calling it a working board
 
 1. Inspect the EasyEDA **schematic netlist** for H1–H4 (especially H3.3→IO45/pad 41 and H4.3→IO46/pad 44), module GND pads, 3V3, USB_5V, IO0, EN, D+, D−. Confirm IO0 and EN remain on their button networks. Refresh ERC and resolve errors one by one; unused intentional pins may receive No Connect flags only after review.
-2. Check every LCSC code against the footprint, **especially the green D1 LED**, C1/C2 0805 size, USB-C connector, ESD package, switch internal common pads, and module antenna shape.
+2. Check every LCSC code against the footprint, **especially green LED1/C72043 and ESD D1/C7519**, C1/C2 0805 size, USB-C connector, switch internal common pads, and module antenna shape. These reference designators were read from the 2026-09-30 screenshot; compare with the actual exported BOM.
 3. Check PCB layout visually, calculate USB trace geometry for the board stackup, then run DRC and inspect the generated Gerbers before ordering.
 4. On first power-up, use a current-limited source and measure USB_5V and 3V3 with no external peripherals. Check heating, supply drop, and switch behavior.
 5. Flash a small GPIO/USB test program, then test Wi-Fi, USB enumeration in both Type-C plug orientations, RESET/BOOT, LED visibility, and all mapped header pins. Verify boot and download mode with any intended circuits on IO45/IO46; test IO46 as an input only. Record the date, photos, measurements, failures, and fixes in this repository.
