@@ -26,7 +26,7 @@ The selected **N4** module has **no PSRAM**. The ESP32-S2 has **Wi-Fi but no Blu
 | BOOT | IO0 held high with 10 kΩ and pulled to GND by the BOOT switch. |
 | RESET | EN held high with 10 kΩ, 1 µF to GND for power-up delay, and pulled to GND by the RESET switch. |
 | Indicator | `3V3 → 330 Ω → green LED anode → LED cathode → GND`. |
-| Expansion | H1–H4 provide GPIO, GND, 3V3, the USB 5 V rail, BOOT/IO0, EN, and UART0 TX/RX. |
+| Expansion | H1–H4 provide GPIO, GND, 3V3, the USB 5 V rail, and UART0 TX/RX. H3 pin 3 is IO45 and H4 pin 3 is input-only IO46; both need boot-strap care. BOOT/IO0 and RESET/EN stay on-board. |
 
 The detailed [pin-by-pin header map](docs/PINOUT.md), [component selection](docs/BOM.md), and [calculations and layout notes](docs/DESIGN_NOTES.md) are separate so I can update them as I verify the schematic.
 
@@ -35,9 +35,10 @@ The detailed [pin-by-pin header map](docs/PINOUT.md), [component selection](docs
 1. **A module pin number is not a GPIO number.** Module pin 45 is **EN**; the signal called **IO45** is on module pin 41. They are different connections.
 2. **A pin name in EasyEDA is not a wire.** A header pin labeled `IO1` only reaches module IO1 when I connect it with a wire or matching net labels. I need to check the generated netlist, not just how the page looks.
 3. **BOOT and RESET do different jobs.** IO0 changes the boot mode when sampled at reset. EN actually resets or enables the chip.
-4. **The whole power path matters.** A regulator's “600 mA” rating is not a promise that my USB port, PCB traces, and SOT-23-5 package can deliver 600 mA continuously to everything attached.
-5. **The LED resistor sets its current.** I chose to keep the green LED and 330 Ω resistor; the LED's actual forward-voltage curve and brightness still depend on the exact LED part.
-6. **PCB placement matters as much as connectivity.** The USB traces need controlled routing and a return path, and the module antenna needs a keepout area.
+4. **Exposed does not mean unrestricted.** I changed the two header contacts from IO0 and EN to IO45 and IO46. IO46 works only as an input, and attached circuits on both pins can affect boot straps. I need to keep them low at the relevant reset/download time.
+5. **The whole power path matters.** A regulator's “600 mA” rating is not a promise that my USB port, PCB traces, and SOT-23-5 package can deliver 600 mA continuously to everything attached.
+6. **The LED resistor sets its current.** I chose to keep the green LED and 330 Ω resistor; the LED's actual forward-voltage curve and brightness still depend on the exact LED part.
+7. **PCB placement matters as much as connectivity.** The USB traces need controlled routing and a return path, and the module antenna needs a keepout area.
 
 ## Rev A progress
 
