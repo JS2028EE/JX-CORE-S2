@@ -1,6 +1,6 @@
 # Component selection and BOM — Rev A draft
 
-These are the **intended** EasyEDA/LCSC selections, based on the current schematic and design discussion. A value in a schematic is not proof that its footprint or supplier number is assigned. Before ordering, export the actual EasyEDA BOM and compare it line by line with this table. Quantities describe one board. Stock is not guaranteed.
+These selections were compared against the [2026-09-30 EasyEDA BOM export](exports/2026-09-30/BOM_Board1_Schematic1_2026-09-30.xlsx): 22 component instances in 14 grouped rows, each with the LCSC supplier number shown below. That verifies the exported assignments, **not** physical footprint geometry, LED polarity, or supplier stock. After any schematic edit, export a fresh BOM and compare it again before ordering. Quantities describe one board.
 
 | Ref(s) | Qty | Part / value | LCSC | Why it is here | Verification |
 | --- | ---: | --- | --- | --- | --- |
@@ -19,7 +19,7 @@ These are the **intended** EasyEDA/LCSC selections, based on the current schemat
 | H1–H4 | 4 | HX PZ2.54-1x10P ZZ, 2.54 mm through-hole header | [C42372502](https://www.lcsc.com/product-detail/C42372502.html) | Four accessible groups of ten signals. This matches the header model visible in the schematic screenshot. | Confirm each electrical pin has an actual connection and review physical pin-1 positions. |
 | LED1 | 1 | Everlight 19-217/GHC-YR1S2/3T, green 0603 LED (label visible in the schematic) | [C72043](https://www.lcsc.com/product-detail/C72043.html) | Visible 3V3 power indicator. | Confirm this exact LCSC number is attached in EasyEDA, check footprint/cathode marking and brightness at 330 Ω. |
 
-**LED selection note.** The 2026-09-30 schematic image labels `LED1` as Everlight 19-217/GHC-YR1S2/3T; LCSC maps that part to C72043. The manufacturer's catalogue gives 3.3 V typical forward voltage at 20 mA. At the board's 3.3 V supply with 330 Ω in series, the operating current and visibility cannot be inferred by plugging 3.3 V into the resistor formula because forward voltage changes with current. Test visibility or select a lower-forward-voltage green LED before ordering. The exported EasyEDA BOM remains the authority for what is actually assigned.
+**LED selection note.** The 2026-09-30 schematic image labels `LED1` as Everlight 19-217/GHC-YR1S2/3T; LCSC maps that part to C72043. The manufacturer's catalogue gives 3.3 V typical forward voltage at 20 mA. At the board's 3.3 V supply with 330 Ω in series, the operating current and visibility cannot be inferred by plugging 3.3 V into the resistor formula because forward voltage changes with current. Test visibility or select a lower-forward-voltage green LED before ordering. The archived EasyEDA BOM confirms C72043 is assigned in this revision. Check its footprint and polarity on the PCB, then test visibility on a built board.
 
 **Alternates and placement.** Earlier discussion also mentioned a 1 kΩ indicator resistor and a red LED. Those are **not** the current design. The 10 µF capacitors are **0805**, while most small passives are **0603**. This matters when assigning EasyEDA footprints. Purchase quantities may exceed board quantities because LCSC sells some parts in multiples.
 

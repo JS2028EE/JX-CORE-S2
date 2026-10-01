@@ -4,7 +4,7 @@
 
 I wanted to understand what actually goes into a microcontroller board: USB-C power and data, a stable 3.3 V rail, boot and reset control, protection, and a way to use the GPIO pins in my own projects. JX-CORE S2 is the board I am designing in EasyEDA around the **ESP32-S2-MINI-2-N4** module, with parts sourced through LCSC.
 
-> **Status: schematic in progress (Rev A).** This repository documents the intended design and the parts selected so far. The [September 30 schematic PDF](docs/schematic/SCH_Schematic1_2026-09-30.pdf) is a **draft export** with the ground connection issue described below. The editable EasyEDA source, PCB layout, fabrication files, and physical test results have **not** been added yet. The board has not been verified or manufactured. Do not treat the tables here as proof that every connection is already present in the EasyEDA file.
+> **Status: schematic in progress (Rev A).** This repository documents the intended design and the parts selected so far. The [September 30 schematic PDF](docs/schematic/SCH_Schematic1_2026-09-30.pdf) is a **draft export** with the ground connection issue described below. The [netlist](docs/exports/2026-09-30/Netlist_Schematic1_2026-09-30.enet), [BOM spreadsheet](docs/exports/2026-09-30/BOM_Board1_Schematic1_2026-09-30.xlsx), and [DRC log](docs/exports/2026-09-30/schDrcLog_2026-09-30.txt) are archived with that PDF. The editable EasyEDA source, PCB layout, fabrication files, and physical test results have **not** been added yet. The board has not been verified or manufactured. Do not treat the tables here as proof that every connection is already present in the EasyEDA file.
 
 > **Netlist finding (2026-09-30):** The exported schematic has a disconnected USB/regulator ground net. Connect `USBC1.A1B12`, `USBC1.B1A12`, `U2.2`, and `C1.2` to the main `GND` net before PCB conversion. See the [export review](docs/NETLIST_REVIEW_2026-09-30.md); an earlier visual review had missed this.
 
@@ -49,10 +49,12 @@ The detailed [pin-by-pin header map](docs/PINOUT.md), [component selection](docs
 - [x] Connect the module GND pins in the working schematic, per the latest design update.
 - [x] Verify **every header contact electrically** against its matching module/net in the exported netlist.
 - [ ] Join the USB connector ground, U2 regulator ground, and C1 input capacitor return to the main `GND` net; re-export the `.enet` and confirm the separate `$1N3` net is gone.
-- [ ] Confirm the green `LED1` schematic symbol exports as Everlight C72043 with the correct footprint and cathode orientation; test expected visibility with 330 Ω.
-- [x] Run schematic DRC (reported zero errors) and inspect the exported power, USB, BOOT, EN, and GND nets.
+- [x] Confirm the exported BOM lists green `LED1` as Everlight C72043.
+- [ ] Verify LED footprint polarity and visibility with 330 Ω on an assembled board.
+- [x] Run schematic DRC: zero fatal errors, zero errors, **one warning** for intentionally unused `U1.27`, `USBC1.A8`, and `USBC1.B8`; inspect the exported nets. See the [export review](docs/NETLIST_REVIEW_2026-09-30.md).
 - [x] Add a dated draft schematic PDF for design review.
-- [ ] Export and commit the corrected EasyEDA source and a new PDF after the ground fix.
+- [ ] Fix the PDF title block, which currently says **ESP32-S3** although U1 is **ESP32-S2-MINI-2-N4**; use JX-CORE S2 for the next export.
+- [ ] Export and commit the corrected editable EasyEDA source and a new PDF/netlist after the ground fix.
 - [ ] Place and route the PCB with the antenna keepout, ground plane, short decoupling paths, and USB routing rules.
 - [ ] Run PCB DRC; inspect footprint pin numbering and 3D orientation; export Gerbers/BOM/placement files.
 - [ ] On a fabricated board, measure USB 5 V and 3.3 V, check startup current, test BOOT/RESET, flash firmware, test Wi-Fi and USB, and record results.

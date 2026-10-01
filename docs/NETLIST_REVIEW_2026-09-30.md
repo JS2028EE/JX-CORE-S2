@@ -1,6 +1,6 @@
 # Exported netlist and BOM review — 2026-09-30
 
-Inputs: EasyEDA Pro `Netlist_Schematic1_2026-09-30.enet` and `BOM_Board1_Schematic1_2026-09-30.xlsx`, exported from `Board1 : Schematic1`. This is a review of those exports, not a review of a corrected schematic or finished PCB.
+Inputs: EasyEDA Pro [netlist](exports/2026-09-30/Netlist_Schematic1_2026-09-30.enet), [BOM spreadsheet](exports/2026-09-30/BOM_Board1_Schematic1_2026-09-30.xlsx), and [schematic PDF](schematic/SCH_Schematic1_2026-09-30.pdf), exported from `Board1 : Schematic1`. The [DRC log](exports/2026-09-30/schDrcLog_2026-09-30.txt) is archived alongside them. This is a review of the dated exports, not a review of a corrected schematic or finished PCB.
 
 ## Required schematic fix before PCB conversion
 
@@ -22,4 +22,8 @@ The connector's **actual USB ground contacts** `USBC1.A1B12` and `USBC1.B1A12`, 
 
 The netlist assigns U1 the manufacturer part **ESP32-S2-MINI-2-N4**, but its footprint is titled **`WIFI-SMD_ESP32-MINI-1-N4`**. A name mismatch is not proof of a wrong pad pattern. Compare its physical pads, pitch, numbered locations, body outline, and antenna keepout against Espressif's [MINI-2 recommended land pattern](https://documentation.espressif.com/esp32-s2-mini-2_esp32-s2-mini-2u_datasheet_en.html), Figure 10-1. Do not approve fabrication based on the footprint title alone. Review the USB-C connector footprint and switch common pads in the same way.
 
-After the ground fix, repeat the netlist check, then inspect the routed PCB with DRC and Gerber/3D review. The schematic DRC previously reported zero errors but did not catch the two separate ground nets.
+The dated schematic PDF's title block says **ESP32-S3 High Power & Speed MC** even though U1 and the BOM specify **ESP32-S2-MINI-2-N4**. Rename the title block to JX-CORE S2 on the next EasyEDA export to avoid revision confusion.
+
+The archived schematic DRC log reports **0 fatal errors, 0 errors, and 1 warning**: floating pins `U1.27` (module NC) and `USBC1.A8`/`USBC1.B8` (unused SBU). Review these as intentional and optionally mark them No Connect. DRC did not catch the separate ground nets. The log is timestamped 10:11:18; rerun it after edits because a dated log does not establish that later schematic changes were checked.
+
+After the ground fix, repeat the netlist check, then inspect the routed PCB with DRC and Gerber/3D review.
